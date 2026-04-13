@@ -1,0 +1,19 @@
+{
+  "name": "drop-senpai",
+  "private": true,
+  "packageManager": "pnpm@9.15.0",
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  },
+  "scripts": {
+    "dev:mobile": "pnpm --filter mobile dev",
+    "dev:admin": "pnpm --filter admin dev",
+    "db:init": "pnpm dlx supabase init",
+    "db:new": "pnpm dlx supabase migration new",
+    "db:reset": "pnpm dlx supabase db reset",
+    "db:push": "pnpm dlx supabase db push",
+    "db:status": "pnpm dlx supabase migration list",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck"
+  }
+}

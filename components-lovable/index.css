@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 228 20% 6%;
+    --foreground: 220 20% 90%;
+
+    --card: 228 18% 10%;
+    --card-foreground: 220 20% 90%;
+
+    --popover: 228 18% 10%;
+    --popover-foreground: 220 20% 90%;
+
+    --primary: 330 85% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 228 15% 16%;
+    --secondary-foreground: 220 20% 85%;
+
+    --muted: 228 15% 14%;
+    --muted-foreground: 220 10% 50%;
+
+    --accent: 185 85% 50%;
+    --accent-foreground: 228 20% 6%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 228 15% 18%;
+    --input: 228 15% 18%;
+    --ring: 330 85% 60%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 228 18% 8%;
+    --sidebar-foreground: 220 20% 90%;
+    --sidebar-primary: 330 85% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 228 15% 14%;
+    --sidebar-accent-foreground: 220 20% 90%;
+    --sidebar-border: 228 15% 18%;
+    --sidebar-ring: 330 85% 60%;
+
+    /* Custom tokens */
+    --glow-primary: 0 0 20px hsl(330 85% 60% / 0.3);
+    --glow-accent: 0 0 20px hsl(185 85% 50% / 0.3);
+    --gradient-hero: linear-gradient(135deg, hsl(330 85% 60%), hsl(270 70% 55%));
+    --gradient-card: linear-gradient(180deg, hsl(228 18% 12%), hsl(228 18% 8%));
+    --event-badge: 330 85% 60%;
+    --drop-badge: 45 95% 55%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+}
+
+@layer utilities {
+  .glow-primary {
+    box-shadow: var(--glow-primary);
+  }
+  .glow-accent {
+    box-shadow: var(--glow-accent);
+  }
+  .text-gradient-hero {
+    background: var(--gradient-hero);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}

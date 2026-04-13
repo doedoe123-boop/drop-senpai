@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "Drop Senpai",
+    "slug": "drop-senpai-mobile",
+    "scheme": "dropsenpai",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "plugins": [
+      "expo-router"
+    ],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

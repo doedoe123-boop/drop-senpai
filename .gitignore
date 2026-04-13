@@ -1,0 +1,60 @@
+# Node
+node_modules
+.pnpm-store
+
+# Build outputs
+dist
+build
+web-build
+.next
+.turbo
+apps/*/.next
+apps/*/dist
+apps/*/build
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+expo-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env files
+.env
+.env.local
+.env.*.local
+apps/*/.env
+apps/*/.env.local
+apps/*/.env.*.local
+
+# Coverage
+coverage
+
+# Expo
+.expo
+.expo-shared
+apps/*/.expo
+apps/*/.expo-shared
+
+# TypeScript
+*.tsbuildinfo
+
+# Supabase (IMPORTANT)
+.supabase
+
+# Vercel / deployment
+.vercel
+
+# IDE
+.vscode
+.idea
+.codex
+
+# Mac
+.AppleDouble
+.LSOverride

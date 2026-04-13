@@ -1,0 +1,66 @@
+insert into public.items (
+  type,
+  title,
+  description,
+  source_url,
+  image_url,
+  event_date,
+  location,
+  city,
+  region,
+  tags,
+  status
+)
+values
+  (
+    'event',
+    'Cosplay Carnival Manila',
+    'A weekend anime convention with cosplay contests, artist booths, and community meetups.',
+    'https://example.com/cosplay-carnival-manila',
+    'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80',
+    '2026-05-16T10:00:00+08:00',
+    'SMX Convention Center',
+    'Pasay',
+    'Metro Manila',
+    array['convention', 'cosplay', 'community'],
+    'approved'
+  ),
+  (
+    'drop',
+    'Weekend Figure Restock',
+    'Limited figure restock from a local hobby shop with same-day pickup.',
+    'https://example.com/weekend-figure-restock',
+    'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1200&q=80',
+    '2026-05-10T09:00:00+08:00',
+    'Akiba Alley',
+    'Quezon City',
+    'Metro Manila',
+    array['figures', 'restock'],
+    'approved'
+  ),
+  (
+    'event',
+    'TCG Community Night Cebu',
+    'Local pop-culture and trading card meetup for casual play and merch hunting.',
+    'https://example.com/tcg-community-night-cebu',
+    null,
+    '2026-06-05T18:30:00+08:00',
+    'Cebu Trade Hall',
+    'Cebu City',
+    'Central Visayas',
+    array['tcg', 'community'],
+    'approved'
+  ),
+  (
+    'drop',
+    'Shop Opening Promo Bundle',
+    'Pending community submission for a new promo bundle announcement.',
+    'https://example.com/shop-opening-promo-bundle',
+    null,
+    '2026-05-21T11:00:00+08:00',
+    'Otaku Corner',
+    'Davao City',
+    'Davao Region',
+    array['promo', 'bundle'],
+    'pending'
+  );
