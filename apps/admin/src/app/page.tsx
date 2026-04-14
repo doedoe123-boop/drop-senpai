@@ -33,7 +33,12 @@ function DashboardContent() {
         </div>
         {moderated ? (
           <div className="admin-banner admin-banner--success">
-            Item {moderated === "approved" ? "approved" : "rejected"}{" "}
+            Item{" "}
+            {moderated === "approved"
+              ? "approved"
+              : moderated === "duplicate"
+                ? "marked as duplicate"
+                : "rejected"}{" "}
             successfully.
           </div>
         ) : null}

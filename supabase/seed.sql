@@ -9,6 +9,7 @@ insert into public.items (
   city,
   region,
   tags,
+  featured,
   status
 )
 values
@@ -23,6 +24,7 @@ values
     'Pasay',
     'Metro Manila',
     array['convention', 'cosplay', 'community'],
+    true,
     'approved'
   ),
   (
@@ -36,6 +38,7 @@ values
     'Quezon City',
     'Metro Manila',
     array['figures', 'restock'],
+    true,
     'approved'
   ),
   (
@@ -49,6 +52,7 @@ values
     'Cebu City',
     'Central Visayas',
     array['tcg', 'community'],
+    false,
     'approved'
   ),
   (
@@ -62,5 +66,6 @@ values
     'Davao City',
     'Davao Region',
     array['promo', 'bundle'],
+    false,
     'pending'
   );

@@ -47,6 +47,7 @@ export interface ItemInsert {
   city?: string | null;
   region?: string | null;
   tags?: string[];
+  featured?: boolean;
   status?: ItemStatus;
   submitted_by?: string | null;
   duplicate_of_item_id?: string | null;

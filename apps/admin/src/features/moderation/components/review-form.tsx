@@ -11,6 +11,7 @@ import { AdminField } from "../../../components/admin-field";
 import { Panel } from "../../../components/panel";
 import { useAdminAuth } from "../../auth/hooks/use-admin-auth";
 import { moderateItem } from "../api/moderation";
+import { useDuplicateCandidates } from "../hooks/use-duplicate-candidates";
 import { usePendingItem } from "../hooks/use-pending-item";
 
 interface ReviewFormProps {
@@ -28,6 +29,7 @@ interface ReviewDraft {
   city: string;
   region: string;
   tags: string;
+  featured: boolean;
   notes: string;
 }
 
@@ -38,6 +40,15 @@ export function ReviewForm({ itemId }: ReviewFormProps) {
   const [draft, setDraft] = useState<ReviewDraft | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [duplicateSearchText, setDuplicateSearchText] = useState("");
+  const [selectedDuplicateId, setSelectedDuplicateId] = useState<string | null>(
+    null,
+  );
+  const duplicateCandidates = useDuplicateCandidates(
+    itemId,
+    duplicateSearchText,
+    Boolean(draft),
+  );
 
   useEffect(() => {
     if (!pendingItem.data) {
@@ -55,11 +66,20 @@ export function ReviewForm({ itemId }: ReviewFormProps) {
       city: pendingItem.data.city ?? "",
       region: pendingItem.data.region ?? "",
       tags: pendingItem.data.tags.join(", "),
+      featured: Boolean(pendingItem.data.featured),
       notes: "",
     });
+    setDuplicateSearchText("");
+    setSelectedDuplicateId(null);
   }, [pendingItem.data]);
 
-  const handleAction = async (action: "approved" | "rejected") => {
+  const handleAction = async (
+    action: "approved" | "rejected",
+    options?: {
+      duplicateOfItemId?: string | null;
+      moderationNote?: string | null;
+    },
+  ) => {
     if (!draft || !user || !supabase) {
       return;
     }
@@ -81,9 +101,13 @@ export function ReviewForm({ itemId }: ReviewFormProps) {
         city: draft.city || null,
         region: draft.region || null,
         tags: parseTags(draft.tags),
-        notes: draft.notes || null,
+        featured: draft.featured,
+        duplicateOfItemId: options?.duplicateOfItemId ?? null,
+        notes: options?.moderationNote ?? (draft.notes || null),
       });
-      router.push(`/?moderated=${action}`);
+      router.push(
+        `/?moderated=${options?.duplicateOfItemId ? "duplicate" : action}`,
+      );
       router.refresh();
     } catch (error) {
       setStatusMessage(
@@ -130,6 +154,10 @@ export function ReviewForm({ itemId }: ReviewFormProps) {
   }
 
   const item = pendingItem.data;
+  const selectedDuplicate =
+    duplicateCandidates.data.find(
+      (candidate) => candidate.id === selectedDuplicateId,
+    ) ?? null;
 
   if (!item) {
     return (
@@ -254,6 +282,76 @@ export function ReviewForm({ itemId }: ReviewFormProps) {
             }
           />
         </AdminField>
+        <AdminField label="Featured">
+          <label
+            style={{ display: "flex", alignItems: "center", gap: 10 }}
+          >
+            <input
+              type="checkbox"
+              checked={draft.featured}
+              onChange={(event) =>
+                setDraft({ ...draft, featured: event.target.checked })
+              }
+            />
+            <span className="admin-muted">
+              Show this item in the Featured section on mobile Home.
+            </span>
+          </label>
+        </AdminField>
+        <AdminField label="Duplicate handling">
+          <div className="admin-form-grid">
+            <input
+              className="admin-input"
+              placeholder="Search approved items by title"
+              value={duplicateSearchText}
+              onChange={(event) => setDuplicateSearchText(event.target.value)}
+            />
+            {duplicateCandidates.error ? (
+              <div className="admin-banner admin-banner--error">
+                {duplicateCandidates.error}
+              </div>
+            ) : null}
+            <div className="admin-list">
+              {duplicateCandidates.data.map((candidate) => (
+                <button
+                  key={candidate.id}
+                  type="button"
+                  onClick={() => setSelectedDuplicateId(candidate.id)}
+                  className="admin-list-item"
+                  style={{
+                    textAlign: "left",
+                    cursor: "pointer",
+                    borderColor:
+                      selectedDuplicateId === candidate.id
+                        ? "rgba(54, 214, 231, 0.5)"
+                        : undefined,
+                  }}
+                >
+                  <div className="admin-list-item__title-row">
+                    <strong>{candidate.title}</strong>
+                    <AdminBadge tone={candidate.type}>{candidate.type}</AdminBadge>
+                  </div>
+                  <div className="admin-kv">
+                    <span className="admin-kv__label">Location</span>
+                    <span className="admin-kv__value">
+                      {[candidate.location, candidate.city, candidate.region]
+                        .filter(Boolean)
+                        .join(", ") || "Not set"}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+            {duplicateCandidates.isLoading ? (
+              <span className="admin-muted">Loading approved matches…</span>
+            ) : null}
+            {selectedDuplicate ? (
+              <div className="admin-banner admin-banner--success">
+                Duplicate target selected: {selectedDuplicate.title}
+              </div>
+            ) : null}
+          </div>
+        </AdminField>
         <AdminField label="Moderation notes">
           <textarea
             className="admin-textarea"
@@ -319,6 +417,32 @@ export function ReviewForm({ itemId }: ReviewFormProps) {
               disabled={isSubmitting}
             >
               {isSubmitting ? "Saving..." : "Approve"}
+            </AdminButton>
+            <AdminButton
+              variant="ghost"
+              onClick={() => {
+                if (!selectedDuplicate) {
+                  setStatusMessage(
+                    "Select an approved item first before marking this submission as a duplicate.",
+                  );
+                  return;
+                }
+
+                const duplicateNote = [
+                  `Marked as duplicate of "${selectedDuplicate.title}".`,
+                  draft.notes.trim(),
+                ]
+                  .filter(Boolean)
+                  .join(" ");
+
+                void handleAction("rejected", {
+                  duplicateOfItemId: selectedDuplicate.id,
+                  moderationNote: duplicateNote,
+                });
+              }}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Saving..." : "Mark duplicate"}
             </AdminButton>
             <AdminButton
               variant="primary"

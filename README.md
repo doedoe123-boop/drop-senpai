@@ -25,6 +25,7 @@ Implemented:
 - mobile Home feed
 - mobile item detail
 - mobile submit flow
+- optional mobile image upload to Supabase Storage
 - mobile email magic-link auth
 - session restore on app launch
 - profile summary
@@ -33,10 +34,12 @@ Implemented:
 - mobile Explore search/filter
 - admin moderation flow
 - admin email + password auth
+- duplicate moderation support
+- rejection notes surfaced in My Submissions
+- featured items backed by `items.featured`
 
 Not implemented yet:
 
-- image upload
 - notifications
 - social features
 - scraping
@@ -80,6 +83,9 @@ Important files:
 - [supabase/config.toml](/var/www/drop-senpai/supabase/config.toml)
 - [supabase/migrations/20260413094943_initial_schema.sql](/var/www/drop-senpai/supabase/migrations/20260413094943_initial_schema.sql)
 - [supabase/migrations/20260413094944_rls_policies.sql](/var/www/drop-senpai/supabase/migrations/20260413094944_rls_policies.sql)
+- [supabase/migrations/20260413095516_storage_item_images.sql](/var/www/drop-senpai/supabase/migrations/20260413095516_storage_item_images.sql)
+- [supabase/migrations/20260413120000_add_featured_column.sql](/var/www/drop-senpai/supabase/migrations/20260413120000_add_featured_column.sql)
+- [supabase/migrations/20260414110000_stabilize_featured_storage_and_submission_logs.sql](/var/www/drop-senpai/supabase/migrations/20260414110000_stabilize_featured_storage_and_submission_logs.sql)
 - [supabase/seed.sql](/var/www/drop-senpai/supabase/seed.sql)
 
 For local development:
@@ -172,13 +178,14 @@ pnpm --filter admin build
 Also verify manually:
 
 - mobile Home feed loads approved seeded items
+- featured seeded items appear in the `Featured` section
 - mobile Detail screen opens from Home
 - Explore search and filters return expected approved items
 - mobile sign-in email link works with your Supabase redirect config
-- signed-in users can submit an item
+- signed-in users can submit an item with or without an uploaded image
 - signed-in users can save and remove bookmarks
-- My Submissions shows the signed-in user's items
-- admin can review and approve or reject pending items
+- My Submissions shows the signed-in user's items, statuses, and rejection notes when applicable
+- admin can review, approve, reject, or mark duplicates for pending items
 - admin email/password sign-in persists across refresh
 
 ## Auth and Ownership Notes
@@ -189,6 +196,9 @@ Also verify manually:
 - authenticated submissions must use `submitted_by = auth.uid()`
 - bookmarks are owned by `bookmarks.user_id = auth.uid()`
 - admin routes require an authenticated user with `profiles.role = 'admin'`
+- item images are stored in `item-images/<user-id>/...`
+- authenticated users can only manage their own uploaded images unless they are admins
+- users can read moderation logs for items they personally submitted
 
 Profile rows are created automatically on first successful sign-in by the mobile and admin clients.
 Admin accounts still authenticate through `auth.users`; authorization continues to come from `public.profiles.role`.
@@ -209,6 +219,8 @@ Important rules:
 - `items.type` is `event` or `drop`
 - `items.status` is `pending`, `approved`, or `rejected`
 - `source_url` is required
+- `items.featured` controls the Home `Featured` section
+- `duplicate_of_item_id` links duplicate submissions to a canonical item
 
 ## Supabase Migration Workflow
 
@@ -253,11 +265,24 @@ If the mobile app cannot load data:
 - confirm seed data exists
 - confirm the anon key belongs to the same Supabase project
 
+If featured items do not appear:
+
+- confirm at least one approved item has `featured = true`
+- confirm the newest migrations were applied
+- confirm the seeded data was reloaded after the featured migration
+
 If magic-link auth does not complete:
 
 - confirm email auth is enabled in Supabase
 - confirm `dropsenpai://auth/callback` is in allowed redirect URLs
 - open the email link on the same device or browser session running the app
+
+If admin login does not work:
+
+- confirm the Email provider and password sign-in are enabled in Supabase
+- confirm the admin account exists in Supabase Auth
+- confirm the account has a matching `public.profiles` row
+- confirm `public.profiles.role = 'admin'`
 
 If admin login does not work:
 

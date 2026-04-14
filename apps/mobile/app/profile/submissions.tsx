@@ -7,7 +7,7 @@ import { ScreenShell } from "../../src/components/screen-shell";
 import { mobileTheme } from "../../src/constants/theme";
 import { AuthGate } from "../../src/features/auth/components/auth-gate";
 import { useAuth } from "../../src/features/auth/hooks/use-auth";
-import { ItemCard } from "../../src/features/items/components/item-card";
+import { SubmissionCard } from "../../src/features/profile/components/submission-card";
 import { useMySubmissions } from "../../src/features/profile/hooks/use-my-submissions";
 
 export default function MySubmissionsScreen() {
@@ -39,12 +39,12 @@ export default function MySubmissionsScreen() {
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.content}
             refreshControl={
-              <RefreshControl
-                refreshing={mySubmissions.isLoading}
+            <RefreshControl
+                refreshing={mySubmissions.isFetching && !mySubmissions.isLoading}
                 onRefresh={() => void mySubmissions.refetch()}
               />
             }
-            renderItem={({ item }) => <ItemCard item={item} />}
+            renderItem={({ item }) => <SubmissionCard item={item} />}
           />
         ) : null}
       </AuthGate>

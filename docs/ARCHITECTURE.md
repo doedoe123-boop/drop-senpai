@@ -215,7 +215,9 @@ Columns:
 - `region` text nullable
 - `tags` text[] not null default '{}'
 - `status` text not null default `pending`
+- `featured` boolean not null default false
 - `submitted_by` uuid nullable references profiles(id) on delete set null
+- `duplicate_of_item_id` uuid nullable references items(id) on delete set null
 - `created_at` timestamptz not null default now()
 - `updated_at` timestamptz not null default now()
 
@@ -276,7 +278,7 @@ Constraints:
 ### Moderation
 1. admin opens pending queue
 2. admin inspects item and source URL
-3. admin approves, rejects, or edits
+3. admin approves, rejects, marks featured, or rejects as duplicate of an existing approved item
 4. action is logged in `submission_logs`
 5. approved items become visible in user app
 
@@ -372,7 +374,9 @@ Enable RLS on all app tables.
 - users can delete their own bookmarks
 
 ### `submission_logs`
-- only admins can read and insert
+- admins can read and insert
+- authenticated users can read logs for items they personally submitted
+- latest rejection notes can be surfaced in the mobile `My Submissions` flow
 
 ---
 
@@ -383,6 +387,8 @@ Use Supabase Storage for optional uploaded images.
 ### Storage rules
 - submitted images should go into a controlled bucket
 - public URLs are acceptable for MVP if content is safe
+- uploaded files should live under `item-images/<user-id>/...`
+- only the owning user or an admin should be able to modify an uploaded object
 - if moderation becomes stricter later, uploaded files may need admin review before full publication
 
 ### Image handling
@@ -402,6 +408,7 @@ Use simple database queries:
 - filter by `tags`
 - sort by `event_date`
 - keyword search by title later
+- use `items.featured = true` as the source of truth for the Home `Featured` section
 
 ### Future improvements
 - full-text search

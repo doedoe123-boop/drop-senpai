@@ -9,12 +9,12 @@ Prioritize simple, shippable work.
 
 ## Current status
 
-Planning complete.
-Next step is implementation scaffolding.
+Core MVP implementation is in place.
+Current focus is stabilization, polish, and launch readiness.
 
 ---
 
-## Phase 1: Foundation
+## Completed foundation
 
 ### 1. Set up repository structure
 - create `apps/mobile`
@@ -47,7 +47,7 @@ Next step is implementation scaffolding.
 
 ---
 
-## Phase 2: Database and auth
+## Completed database and auth
 
 ### 5. Create database schema
 - create `profiles` table
@@ -71,7 +71,7 @@ Next step is implementation scaffolding.
 
 ---
 
-## Phase 3: Mobile app MVP
+## Completed mobile MVP
 
 ### 8. Build navigation
 - bottom tabs:
@@ -97,6 +97,7 @@ Next step is implementation scaffolding.
 - region filters
 - tag filters
 - reusable item list
+- date filter deferred unless needed for launch
 
 ### 11. Build Item Detail screen
 - image
@@ -127,12 +128,12 @@ Next step is implementation scaffolding.
 ### 14. Build Profile screen
 - show basic account info
 - sign in/sign out
-- placeholder for my submissions
+- my submissions with status feedback
 - placeholder for preferences if needed later
 
 ---
 
-## Phase 4: Admin MVP
+## Completed admin MVP
 
 ### 15. Build admin layout
 - dashboard shell
@@ -150,16 +151,16 @@ Next step is implementation scaffolding.
 - edit item fields
 - approve
 - reject
+- mark duplicate
+- toggle featured
 - save moderation log
 
-### 18. Build approved and rejected views
-- basic filtered lists
-- edit actions
-- quick status changes if useful
+### 18. Approved and rejected views
+- can remain deferred unless moderation throughput becomes a problem
 
 ---
 
-## Phase 5: Quality
+## Current stabilization work
 
 ### 19. Add loading and empty states
 - all primary screens should handle:
@@ -185,15 +186,17 @@ Next step is implementation scaffolding.
 ### 22. Add basic seed or mock data mode
 - support local mock data for UI development
 - keep seed data minimal and realistic
+- current repo uses Supabase seed data instead of a separate mock mode
 
 ---
 
-## Phase 6: Launch preparation
+## Remaining launch-prep tasks
 
 ### 23. Seed initial content
 - add 20 to 30 approved items manually
 - mix events and drops
 - ensure each item has a real source link
+- ensure a few items are explicitly marked `featured = true`
 
 ### 24. QA critical flows
 - browse feed
@@ -201,6 +204,8 @@ Next step is implementation scaffolding.
 - save bookmark
 - submit item
 - approve submission in admin
+- reject with note and confirm note appears in My Submissions
+- mark duplicate and confirm duplicate feedback appears in My Submissions
 - verify approved item appears in mobile app
 
 ### 25. Prepare deployment
@@ -229,12 +234,12 @@ Do not work on these yet:
 
 ## Immediate next actions
 
-1. initialize Expo app
-2. initialize Next.js admin app
-3. create Supabase schema
-4. define shared TypeScript types
-5. build mobile navigation shell
-6. build pending admin queue shell
+1. update docs and setup instructions
+2. seed more realistic approved and featured content
+3. tighten launch QA around auth, moderation, and duplicate handling
+4. review any remaining UI polish issues on mobile
+5. prepare deployment configuration
+6. optionally add first-admin bootstrap guidance or script
 
 ---
 
@@ -244,6 +249,7 @@ MVP is done when:
 - users can browse approved items
 - users can save bookmarks
 - users can submit new items
-- admins can review and approve submissions
+- admins can review, approve, reject, and mark duplicates
 - approved items show in the mobile app
+- rejected items show useful moderator feedback in My Submissions
 - the app has basic loading, empty, and error states

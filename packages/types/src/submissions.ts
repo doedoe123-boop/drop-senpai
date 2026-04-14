@@ -1,4 +1,5 @@
-import type { ItemType } from "./database";
+import type { ItemStatus, ItemType, SubmissionLogAction } from "./database";
+import type { ItemCardModel } from "./items";
 
 export interface SubmissionInput {
   type: ItemType;
@@ -11,4 +12,12 @@ export interface SubmissionInput {
   city?: string | null;
   region?: string | null;
   tags?: string[];
+}
+
+export interface SubmissionListItemModel extends ItemCardModel {
+  status: ItemStatus;
+  latestModerationAction: SubmissionLogAction | null;
+  latestRejectionNote: string | null;
+  duplicateOfItemId: string | null;
+  duplicateOfItemTitle: string | null;
 }

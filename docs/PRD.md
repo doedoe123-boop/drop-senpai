@@ -40,11 +40,12 @@ Build only these user-facing features:
    * featured section
    * upcoming events
    * latest drops
+   * featured items are explicitly curated via admin moderation
 
 2. Explore
 
    * search
-   * filter by type, date, location, tags
+   * filter by type, location, tags
 
 3. Detail screen
 
@@ -78,6 +79,8 @@ Build only these user-facing features:
 
    * basic account info
    * my submissions
+   * submission status feedback
+   * latest rejection note when applicable
    * preferences later if needed
 
 # Admin MVP
@@ -87,7 +90,8 @@ Build a simple admin web interface for moderation:
 * view pending submissions
 * approve / reject / edit
 * inspect source link
-* mark duplicates
+* mark duplicates using an existing approved item
+* optionally mark items as featured
 
 # Non-goals for MVP
 
@@ -171,6 +175,8 @@ Single table for both events and drops:
 * action
 * notes
 * created_at
+
+In the current MVP, `submission_logs` are in use and power submitter feedback such as rejection notes.
 
 # Content/source rules
 

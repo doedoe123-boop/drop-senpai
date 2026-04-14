@@ -22,7 +22,19 @@ export interface ModerationInput {
   city: string | null;
   region: string | null;
   tags: string[];
+  featured: boolean;
+  duplicateOfItemId?: string | null;
   notes?: string | null;
+}
+
+export interface DuplicateCandidate {
+  id: string;
+  title: string;
+  type: "event" | "drop";
+  event_date: string | null;
+  location: string | null;
+  city: string | null;
+  region: string | null;
 }
 
 export async function fetchPendingItems(
@@ -76,6 +88,8 @@ export async function moderateItem(
       city: input.city,
       region: input.region,
       tags: input.tags,
+      featured: input.featured,
+      duplicate_of_item_id: input.duplicateOfItemId ?? null,
       status: input.action,
     })
     .eq("id", input.itemId);
@@ -96,4 +110,30 @@ export async function moderateItem(
   if (logError) {
     throw logError;
   }
+}
+
+export async function fetchDuplicateCandidates(
+  supabase: ReturnTypeOfSupabase,
+  itemId: string,
+  searchText: string,
+): Promise<DuplicateCandidate[]> {
+  let query = supabase
+    .from("items")
+    .select("id, title, type, event_date, location, city, region")
+    .eq("status", "approved")
+    .neq("id", itemId)
+    .order("event_date", { ascending: true, nullsFirst: false })
+    .limit(6);
+
+  if (searchText.trim()) {
+    query = query.ilike("title", `%${searchText.trim()}%`);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    throw error;
+  }
+
+  return (data ?? []) as DuplicateCandidate[];
 }
