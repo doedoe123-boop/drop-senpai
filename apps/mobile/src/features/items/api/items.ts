@@ -43,6 +43,7 @@ export async function fetchUpcomingEvents(): Promise<ItemCardModel[]> {
     .select("*")
     .eq("status", "approved")
     .eq("type", "event")
+    .eq("featured", false)
     .gte("event_date", new Date().toISOString())
     .order("event_date", { ascending: true })
     .limit(20);
@@ -60,6 +61,7 @@ export async function fetchLatestDrops(): Promise<ItemCardModel[]> {
     .select("*")
     .eq("status", "approved")
     .eq("type", "drop")
+    .eq("featured", false)
     .order("event_date", { ascending: true, nullsFirst: false })
     .limit(20);
 

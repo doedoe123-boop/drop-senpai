@@ -10,6 +10,11 @@ export interface PickedImageAsset {
   uri: string;
 }
 
+export interface UploadedSubmissionImage {
+  path: string;
+  publicUrl: string;
+}
+
 export async function pickImageFromLibrary(): Promise<PickedImageAsset | null> {
   const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -36,7 +41,10 @@ export async function pickImageFromLibrary(): Promise<PickedImageAsset | null> {
   };
 }
 
-export async function uploadSubmissionImage(userId: string, image: PickedImageAsset): Promise<string> {
+export async function uploadSubmissionImage(
+  userId: string,
+  image: PickedImageAsset,
+): Promise<UploadedSubmissionImage> {
   const filePath = `${userId}/${Date.now()}-${sanitizeFileName(image.fileName)}`;
   const response = await fetch(image.uri);
   const imageBytes = await response.arrayBuffer();
@@ -52,7 +60,20 @@ export async function uploadSubmissionImage(userId: string, image: PickedImageAs
 
   const { data } = supabase.storage.from(ITEM_IMAGES_BUCKET).getPublicUrl(filePath);
 
-  return data.publicUrl;
+  return {
+    path: filePath,
+    publicUrl: data.publicUrl,
+  };
+}
+
+export async function deleteUploadedSubmissionImage(path: string) {
+  const { error } = await supabase.storage
+    .from(ITEM_IMAGES_BUCKET)
+    .remove([path]);
+
+  if (error) {
+    throw error;
+  }
 }
 
 function sanitizeFileName(value: string): string {

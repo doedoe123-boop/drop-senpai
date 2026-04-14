@@ -32,7 +32,7 @@ export async function fetchMySubmissions(
 
   const latestLogsByItemId = new Map<
     string,
-    { action: SubmissionLogAction; note: string | null }
+    { action: SubmissionLogAction; note: string | null; createdAt: string }
   >();
   const latestRejectedNoteByItemId = new Map<string, string>();
   const duplicateTitlesById = new Map<string, string>();
@@ -53,6 +53,7 @@ export async function fetchMySubmissions(
         latestLogsByItemId.set(log.item_id, {
           action: log.action,
           note: log.notes ?? null,
+          createdAt: log.created_at,
         });
       }
 
@@ -90,6 +91,7 @@ export async function fetchMySubmissions(
       ...base,
       status: item.status,
       latestModerationAction: latestLog?.action ?? null,
+      latestModerationAt: latestLog?.createdAt ?? null,
       latestRejectionNote:
         item.status === "rejected"
           ? latestRejectedNoteByItemId.get(item.id) ?? null

@@ -58,6 +58,20 @@ function parseTags(value: string) {
     .filter(Boolean);
 }
 
+function buildDuplicateModerationNote(
+  duplicateTitle: string,
+  moderatorNote: string,
+) {
+  const baseNote = `Marked as duplicate of "${duplicateTitle}".`;
+  const trimmedModeratorNote = moderatorNote.trim();
+
+  if (!trimmedModeratorNote) {
+    return baseNote;
+  }
+
+  return `${baseNote} ${trimmedModeratorNote}`;
+}
+
 export function ReviewForm({
   item,
   reviewerId,
@@ -373,7 +387,10 @@ export function ReviewForm({
               void runAction("rejected", {
                 duplicateOfItemId: selectedDuplicateId,
                 moderationNote: selectedDuplicate
-                  ? `Marked as duplicate of "${selectedDuplicate.title}".`
+                  ? buildDuplicateModerationNote(
+                      selectedDuplicate.title,
+                      draft.notes,
+                    )
                   : draft.notes || null,
               })
             }

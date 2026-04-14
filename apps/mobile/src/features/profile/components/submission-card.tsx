@@ -52,7 +52,11 @@ function typeColors(type: SubmissionListItemModel["type"]) {
 export function SubmissionCard({ item }: SubmissionCardProps) {
   const statusTone = statusColors(item.status);
   const typeTone = typeColors(item.type);
-  const primaryDate = item.eventDate ?? item.createdAt;
+  const submissionDate = formatEventDateTime(item.createdAt);
+  const scheduledDate = item.eventDate ? formatEventDateTime(item.eventDate) : null;
+  const latestModerationDate = item.latestModerationAt
+    ? formatEventDateTime(item.latestModerationAt)
+    : null;
 
   return (
     <View style={styles.card}>
@@ -80,8 +84,18 @@ export function SubmissionCard({ item }: SubmissionCardProps) {
             size={15}
             color={mobileTheme.colors.primary}
           />
-          <Text style={styles.metaText}>{formatEventDateTime(primaryDate)}</Text>
+          <Text style={styles.metaText}>Submitted {submissionDate}</Text>
         </View>
+        {scheduledDate ? (
+          <View style={styles.metaRow}>
+            <Ionicons
+              name="time-outline"
+              size={15}
+              color={mobileTheme.colors.primary}
+            />
+            <Text style={styles.metaText}>Scheduled {scheduledDate}</Text>
+          </View>
+        ) : null}
         {item.locationLabel ? (
           <View style={styles.metaRow}>
             <Ionicons
@@ -90,6 +104,18 @@ export function SubmissionCard({ item }: SubmissionCardProps) {
               color={mobileTheme.colors.primary}
             />
             <Text style={styles.metaText}>{item.locationLabel}</Text>
+          </View>
+        ) : null}
+        {latestModerationDate ? (
+          <View style={styles.metaRow}>
+            <Ionicons
+              name="checkmark-done-outline"
+              size={15}
+              color={mobileTheme.colors.primary}
+            />
+            <Text style={styles.metaText}>
+              Last reviewed {latestModerationDate}
+            </Text>
           </View>
         ) : null}
       </View>

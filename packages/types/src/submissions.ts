@@ -17,6 +17,7 @@ export interface SubmissionInput {
 export interface SubmissionListItemModel extends ItemCardModel {
   status: ItemStatus;
   latestModerationAction: SubmissionLogAction | null;
+  latestModerationAt: string | null;
   latestRejectionNote: string | null;
   duplicateOfItemId: string | null;
   duplicateOfItemTitle: string | null;

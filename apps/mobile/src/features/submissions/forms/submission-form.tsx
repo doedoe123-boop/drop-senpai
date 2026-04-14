@@ -20,6 +20,7 @@ import { DatePickerField } from "../components/date-picker-field";
 import { ImagePickerField } from "../components/image-picker-field";
 import { useCreateSubmission } from "../hooks/use-create-submission";
 import {
+  deleteUploadedSubmissionImage,
   pickImageFromLibrary,
   uploadSubmissionImage,
   type PickedImageAsset,
@@ -82,17 +83,32 @@ export function SubmissionForm() {
   const onSubmit = handleSubmit(async (values) => {
     const normalizedInput = cleanSubmissionPayload(values);
     let imageUrl = normalizedInput.image_url ?? null;
+    let uploadedImagePath: string | null = null;
 
-    if (user?.id && pickedImage) {
-      imageUrl = await uploadSubmissionImage(user.id, pickedImage);
+    try {
+      if (user?.id && pickedImage) {
+        const uploadedImage = await uploadSubmissionImage(user.id, pickedImage);
+        imageUrl = uploadedImage.publicUrl;
+        uploadedImagePath = uploadedImage.path;
+      }
+
+      await createSubmission.mutateAsync({
+        ...normalizedInput,
+        image_url: imageUrl,
+      });
+      reset(placeholderDefaults);
+      setPickedImage(null);
+    } catch (error) {
+      if (uploadedImagePath) {
+        try {
+          await deleteUploadedSubmissionImage(uploadedImagePath);
+        } catch (cleanupError) {
+          console.warn("Could not delete uploaded image after failed submission.", cleanupError);
+        }
+      }
+
+      throw error;
     }
-
-    await createSubmission.mutateAsync({
-      ...normalizedInput,
-      image_url: imageUrl,
-    });
-    reset(placeholderDefaults);
-    setPickedImage(null);
   });
 
   const handlePickImage = async () => {
