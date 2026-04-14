@@ -4,11 +4,14 @@ import {
   type ItemCardModel,
   type ItemDetailModel,
   type ItemType,
-  type ItemRow,
+  type ItemRowWithAuthor,
 } from "@drop-senpai/types";
 
 import { supabase } from "../../../lib/supabase";
 import { sortItemsByNearestUpcomingEventDate } from "../utils/sort-items";
+
+const ITEM_WITH_AUTHOR_SELECT =
+  "*, profiles:submitted_by(id, display_name, username, avatar_url, is_verified_organizer, reputation_points)";
 
 export interface ApprovedItemsFilters {
   searchText?: string;
@@ -24,7 +27,7 @@ export async function fetchApprovedItems(): Promise<ItemCardModel[]> {
 export async function fetchFeaturedItems(): Promise<ItemCardModel[]> {
   const { data: explicit, error: explicitError } = await supabase
     .from("items")
-    .select("*")
+    .select(ITEM_WITH_AUTHOR_SELECT)
     .eq("status", "approved")
     .eq("featured", true)
     .order("event_date", { ascending: true, nullsFirst: false })
@@ -34,13 +37,15 @@ export async function fetchFeaturedItems(): Promise<ItemCardModel[]> {
     throw explicitError;
   }
 
-  return ((explicit ?? []) as ItemRow[]).map(mapItemRowToCardModel);
+  return ((explicit ?? []) as unknown as ItemRowWithAuthor[]).map(
+    mapItemRowToCardModel,
+  );
 }
 
 export async function fetchUpcomingEvents(): Promise<ItemCardModel[]> {
   const { data, error } = await supabase
     .from("items")
-    .select("*")
+    .select(ITEM_WITH_AUTHOR_SELECT)
     .eq("status", "approved")
     .eq("type", "event")
     .eq("featured", false)
@@ -52,13 +57,15 @@ export async function fetchUpcomingEvents(): Promise<ItemCardModel[]> {
     throw error;
   }
 
-  return ((data ?? []) as ItemRow[]).map(mapItemRowToCardModel);
+  return ((data ?? []) as unknown as ItemRowWithAuthor[]).map(
+    mapItemRowToCardModel,
+  );
 }
 
 export async function fetchLatestDrops(): Promise<ItemCardModel[]> {
   const { data, error } = await supabase
     .from("items")
-    .select("*")
+    .select(ITEM_WITH_AUTHOR_SELECT)
     .eq("status", "approved")
     .eq("type", "drop")
     .eq("featured", false)
@@ -69,15 +76,18 @@ export async function fetchLatestDrops(): Promise<ItemCardModel[]> {
     throw error;
   }
 
-  return sortItemsByNearestUpcomingEventDate(data as ItemRow[]).map(
-    mapItemRowToCardModel,
-  );
+  return sortItemsByNearestUpcomingEventDate(
+    data as unknown as ItemRowWithAuthor[],
+  ).map(mapItemRowToCardModel);
 }
 
 export async function fetchApprovedItemsWithFilters(
   filters: ApprovedItemsFilters,
 ): Promise<ItemCardModel[]> {
-  let query = supabase.from("items").select("*").eq("status", "approved");
+  let query = supabase
+    .from("items")
+    .select(ITEM_WITH_AUTHOR_SELECT)
+    .eq("status", "approved");
 
   if (filters.searchText?.trim()) {
     query = query.ilike("title", `%${filters.searchText.trim()}%`);
@@ -103,7 +113,7 @@ export async function fetchApprovedItemsWithFilters(
     throw error;
   }
 
-  const items = (data ?? []) as ItemRow[];
+  const items = (data ?? []) as unknown as ItemRowWithAuthor[];
 
   return sortItemsByNearestUpcomingEventDate(items).map(mapItemRowToCardModel);
 }
@@ -134,7 +144,7 @@ export async function fetchApprovedItemById(
 ): Promise<ItemDetailModel> {
   const { data, error } = await supabase
     .from("items")
-    .select("*")
+    .select(ITEM_WITH_AUTHOR_SELECT)
     .eq("status", "approved")
     .eq("id", itemId)
     .single();
@@ -143,7 +153,7 @@ export async function fetchApprovedItemById(
     throw error;
   }
 
-  const row = data as ItemRow;
+  const row = data as unknown as ItemRowWithAuthor;
 
   return mapItemRowToDetailModel(row);
 }

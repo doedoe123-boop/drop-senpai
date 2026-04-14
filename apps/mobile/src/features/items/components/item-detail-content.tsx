@@ -14,6 +14,7 @@ import type { ItemDetailModel } from "@drop-senpai/types";
 
 import { mobileTheme } from "../../../constants/theme";
 import { BookmarkButton } from "../../bookmarks/components/bookmark-button";
+import { CommentSection } from "../../comments/components/comment-section";
 
 interface ItemDetailContentProps {
   item: ItemDetailModel;
@@ -71,6 +72,25 @@ export function ItemDetailContent({ item }: ItemDetailContentProps) {
         <Text style={styles.title}>{item.title}</Text>
       </View>
 
+      {item.author ? (
+        <View style={styles.authorSection}>
+          <Text style={styles.authorLabel}>
+            Posted by{" "}
+            <Text style={styles.authorName}>{item.author.displayName}</Text>
+          </Text>
+          {item.author.isVerifiedOrganizer ? (
+            <View style={styles.verifiedBadge}>
+              <Ionicons
+                name="checkmark-circle"
+                size={13}
+                color={mobileTheme.colors.accent}
+              />
+              <Text style={styles.verifiedText}>Verified Organizer</Text>
+            </View>
+          ) : null}
+        </View>
+      ) : null}
+
       <View style={styles.metaSection}>
         {item.eventDate ? (
           <View style={styles.metaRow}>
@@ -119,6 +139,8 @@ export function ItemDetailContent({ item }: ItemDetailContentProps) {
         </Pressable>
         <BookmarkButton itemId={item.id} variant="icon" />
       </View>
+
+      <CommentSection itemId={item.id} />
     </ScrollView>
   );
 }
@@ -235,5 +257,33 @@ const styles = StyleSheet.create({
     color: "#ffffff",
     fontWeight: "700",
     fontSize: mobileTheme.fontSize.base,
+  },
+  authorSection: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: mobileTheme.spacing.sm,
+    flexWrap: "wrap",
+  },
+  authorLabel: {
+    color: mobileTheme.colors.textMuted,
+    fontSize: mobileTheme.fontSize.base,
+  },
+  authorName: {
+    color: mobileTheme.colors.text,
+    fontWeight: "600",
+  },
+  verifiedBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    borderRadius: mobileTheme.radius.full,
+    backgroundColor: "rgba(19, 205, 212, 0.15)",
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  verifiedText: {
+    color: mobileTheme.colors.accent,
+    fontSize: mobileTheme.fontSize.xs,
+    fontWeight: "700",
   },
 });

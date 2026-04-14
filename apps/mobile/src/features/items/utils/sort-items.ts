@@ -16,7 +16,9 @@ function getUpcomingSortValue(dateValue: string | null): number {
   return timestamp >= now ? timestamp : now + Number.MAX_SAFE_INTEGER;
 }
 
-export function sortItemsByNearestUpcomingEventDate(items: ItemRow[]): ItemRow[] {
+export function sortItemsByNearestUpcomingEventDate<T extends ItemRow>(
+  items: T[],
+): T[] {
   return [...items].sort((leftItem, rightItem) => {
     const leftSortValue = getUpcomingSortValue(leftItem.event_date);
     const rightSortValue = getUpcomingSortValue(rightItem.event_date);

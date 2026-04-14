@@ -39,13 +39,21 @@ async function ProtectedLayoutContent({
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.12),transparent_30%),linear-gradient(180deg,#020617_0%,#020617_100%)] text-slate-50">
       <div className="border-b border-white/10 bg-slate-950/80 backdrop-blur">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
-          <Link
-            href="/protected"
-            className="flex items-center gap-3 text-sm font-semibold tracking-[0.24em] text-cyan-300"
-          >
-            <ShieldCheck className="h-4 w-4" />
-            ADMIN
-          </Link>
+          <nav className="flex items-center gap-6">
+            <Link
+              href="/protected"
+              className="flex items-center gap-3 text-sm font-semibold tracking-[0.24em] text-cyan-300"
+            >
+              <ShieldCheck className="h-4 w-4" />
+              ADMIN
+            </Link>
+            <Link
+              href="/protected/users"
+              className="text-sm font-medium text-slate-400 transition-colors hover:text-slate-200"
+            >
+              Users
+            </Link>
+          </nav>
           <div className="flex items-center gap-4 text-sm text-slate-300">
             <span className="hidden sm:inline">{access.user.email}</span>
             <LogoutButton />

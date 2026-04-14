@@ -1,5 +1,6 @@
 import type {
   ItemRow,
+  ProfileRow,
   SubmissionListItemModel,
   SubmissionLogAction,
   SubmissionLogRow,
@@ -8,8 +9,38 @@ import { mapItemRowToCardModel } from "@drop-senpai/types";
 
 import { supabase } from "../../../lib/supabase";
 
-interface ModerationLogSummary
-  extends Pick<SubmissionLogRow, "item_id" | "action" | "notes" | "created_at"> {}
+interface ModerationLogSummary extends Pick<
+  SubmissionLogRow,
+  "item_id" | "action" | "notes" | "created_at"
+> {}
+
+export async function fetchUserProfile(userId: string): Promise<ProfileRow> {
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", userId)
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data as ProfileRow;
+}
+
+export async function updateDisplayName(
+  userId: string,
+  displayName: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from("profiles")
+    .update({ display_name: displayName.trim() || null })
+    .eq("id", userId);
+
+  if (error) {
+    throw error;
+  }
+}
 
 export async function fetchMySubmissions(
   userId: string,
@@ -78,7 +109,10 @@ export async function fetchMySubmissions(
     }
 
     for (const duplicateItem of duplicateItems ?? []) {
-      duplicateTitlesById.set(duplicateItem.id as string, duplicateItem.title as string);
+      duplicateTitlesById.set(
+        duplicateItem.id as string,
+        duplicateItem.title as string,
+      );
     }
   }
 
@@ -94,11 +128,11 @@ export async function fetchMySubmissions(
       latestModerationAt: latestLog?.createdAt ?? null,
       latestRejectionNote:
         item.status === "rejected"
-          ? latestRejectedNoteByItemId.get(item.id) ?? null
+          ? (latestRejectedNoteByItemId.get(item.id) ?? null)
           : null,
       duplicateOfItemId,
       duplicateOfItemTitle: duplicateOfItemId
-        ? duplicateTitlesById.get(duplicateOfItemId) ?? null
+        ? (duplicateTitlesById.get(duplicateOfItemId) ?? null)
         : null,
     };
   });

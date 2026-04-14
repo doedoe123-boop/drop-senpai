@@ -97,6 +97,18 @@ export function ItemCard({ item }: ItemCardProps) {
             ))}
           </View>
         ) : null}
+        {item.author ? (
+          <View style={styles.authorRow}>
+            <Text style={styles.authorText}>by {item.author.displayName}</Text>
+            {item.author.isVerifiedOrganizer ? (
+              <Ionicons
+                name="checkmark-circle"
+                size={13}
+                color={mobileTheme.colors.accent}
+              />
+            ) : null}
+          </View>
+        ) : null}
       </View>
     </Pressable>
   );
@@ -207,5 +219,14 @@ const styles = StyleSheet.create({
     color: mobileTheme.colors.textSecondary,
     fontSize: 11,
     fontWeight: "600",
+  },
+  authorRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  authorText: {
+    color: mobileTheme.colors.textMuted,
+    fontSize: 12,
   },
 });

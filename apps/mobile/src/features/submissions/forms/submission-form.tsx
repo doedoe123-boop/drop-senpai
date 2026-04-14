@@ -16,6 +16,7 @@ import type { SubmissionInput } from "@drop-senpai/types";
 
 import { mobileTheme } from "../../../constants/theme";
 import { useAuth } from "../../auth/hooks/use-auth";
+import { useUserProfile } from "../../profile/hooks/use-user-profile";
 import { DatePickerField } from "../components/date-picker-field";
 import { ImagePickerField } from "../components/image-picker-field";
 import { useCreateSubmission } from "../hooks/use-create-submission";
@@ -68,6 +69,8 @@ function cleanSubmissionPayload(input: SubmissionSchemaInput): SubmissionInput {
 
 export function SubmissionForm() {
   const { user } = useAuth();
+  const { data: profile } = useUserProfile(user?.id);
+  const isVerifiedOrganizer = profile?.is_verified_organizer ?? false;
   const [pickedImage, setPickedImage] = useState<PickedImageAsset | null>(null);
   const {
     control,
@@ -78,7 +81,7 @@ export function SubmissionForm() {
     resolver: zodResolver(submissionSchema),
     defaultValues: placeholderDefaults,
   });
-  const createSubmission = useCreateSubmission(user?.id);
+  const createSubmission = useCreateSubmission(user?.id, isVerifiedOrganizer);
 
   const onSubmit = handleSubmit(async (values) => {
     createSubmission.reset();
@@ -295,7 +298,9 @@ export function SubmissionForm() {
       />
       {createSubmission.isSuccess ? (
         <Text style={styles.success}>
-          Submission sent for review. It is now pending moderation.
+          {isVerifiedOrganizer
+            ? "Published! Your item is now live."
+            : "Submission sent for review. It is now pending moderation."}
         </Text>
       ) : null}
       {createSubmission.isError ? (
@@ -314,7 +319,11 @@ export function SubmissionForm() {
         disabled={createSubmission.isPending || !user}
       >
         <Text style={styles.buttonText}>
-          {createSubmission.isPending ? "Submitting..." : "Submit for review"}
+          {createSubmission.isPending
+            ? "Submitting..."
+            : isVerifiedOrganizer
+              ? "Publish now"
+              : "Submit for review"}
         </Text>
       </Pressable>
     </View>

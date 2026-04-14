@@ -2,9 +2,12 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { SubmissionInput } from "@drop-senpai/types";
 
 import { queryKeys } from "../../../constants/query-keys";
-import { createPendingSubmission } from "../api/create-submission";
+import { createSubmission } from "../api/create-submission";
 
-export function useCreateSubmission(userId: string | undefined) {
+export function useCreateSubmission(
+  userId: string | undefined,
+  isVerifiedOrganizer: boolean = false,
+) {
   const queryClient = useQueryClient();
 
   return useMutation<{ id: string }, Error, SubmissionInput>({
@@ -13,7 +16,7 @@ export function useCreateSubmission(userId: string | undefined) {
         throw new Error("Sign in before submitting an item.");
       }
 
-      return createPendingSubmission(input, userId);
+      return createSubmission(input, userId, isVerifiedOrganizer);
     },
     onSuccess: async () => {
       if (userId) {

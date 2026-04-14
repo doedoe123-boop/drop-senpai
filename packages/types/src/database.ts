@@ -9,8 +9,11 @@ export type SubmissionLogAction = "approved" | "rejected" | "edited";
 export interface ProfileRow {
   id: string;
   username: string | null;
+  display_name: string | null;
   avatar_url: string | null;
   role: ProfileRole;
+  is_verified_organizer: boolean;
+  reputation_points: number;
   created_at: string;
 }
 
@@ -85,6 +88,32 @@ export interface SubmissionLogInsert {
   notes?: string | null;
 }
 
+export interface CommentRow {
+  id: string;
+  item_id: string;
+  user_id: string;
+  body: string;
+  created_at: string;
+}
+
+export interface CommentInsert {
+  item_id: string;
+  user_id: string;
+  body: string;
+}
+
+export interface CommentLikeRow {
+  id: string;
+  comment_id: string;
+  user_id: string;
+  created_at: string;
+}
+
+export interface CommentLikeInsert {
+  comment_id: string;
+  user_id: string;
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -110,6 +139,18 @@ export interface Database {
         Row: SubmissionLogRow;
         Insert: SubmissionLogInsert;
         Update: Partial<SubmissionLogInsert>;
+        Relationships: [];
+      };
+      comments: {
+        Row: CommentRow;
+        Insert: CommentInsert;
+        Update: Partial<CommentInsert>;
+        Relationships: [];
+      };
+      comment_likes: {
+        Row: CommentLikeRow;
+        Insert: CommentLikeInsert;
+        Update: Partial<CommentLikeInsert>;
         Relationships: [];
       };
     };

@@ -7,9 +7,13 @@ import { mobileTheme } from "../../src/constants/theme";
 import { AuthForm } from "../../src/features/auth/components/auth-form";
 import { useAuth } from "../../src/features/auth/hooks/use-auth";
 import { ProfileSummary } from "../../src/features/profile/components/profile-summary";
+import { useUserProfile } from "../../src/features/profile/hooks/use-user-profile";
+import { useUpdateDisplayName } from "../../src/features/profile/hooks/use-update-display-name";
 
 export default function ProfileScreen() {
   const { isLoading, user, signOut } = useAuth();
+  const { data: profile } = useUserProfile(user?.id);
+  const updateDisplayName = useUpdateDisplayName(user?.id);
 
   return (
     <ScreenShell>
@@ -27,7 +31,11 @@ export default function ProfileScreen() {
           {user ? (
             <ProfileSummary
               email={user.email ?? "No email available"}
+              displayName={profile?.display_name}
+              reputationPoints={profile?.reputation_points}
+              isVerifiedOrganizer={profile?.is_verified_organizer}
               onSignOut={signOut}
+              onUpdateDisplayName={(name) => updateDisplayName.mutate(name)}
             />
           ) : (
             <AuthForm />

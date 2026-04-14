@@ -1,4 +1,12 @@
-import type { ItemRow, ItemStatus, ItemType } from "./database";
+import type { ItemRow, ItemStatus, ItemType, ProfileRow } from "./database";
+
+export interface ItemAuthor {
+  id: string;
+  displayName: string;
+  avatarUrl: string | null;
+  isVerifiedOrganizer: boolean;
+  reputationPoints: number;
+}
 
 export interface ItemCardModel {
   id: string;
@@ -12,6 +20,7 @@ export interface ItemCardModel {
   imageUrl: string | null;
   sourceUrl: string;
   tags: string[];
+  author: ItemAuthor | null;
 }
 
 export interface ItemDetailModel extends ItemCardModel {
@@ -22,7 +31,44 @@ export interface ItemDetailModel extends ItemCardModel {
   region: string | null;
 }
 
-export function mapItemRowToCardModel(item: ItemRow): ItemCardModel {
+type ProfileJoin = Pick<
+  ProfileRow,
+  | "id"
+  | "display_name"
+  | "username"
+  | "avatar_url"
+  | "is_verified_organizer"
+  | "reputation_points"
+>;
+
+export interface ItemRowWithAuthor extends ItemRow {
+  profiles?: ProfileJoin | ProfileJoin[] | null;
+}
+
+function resolveDisplayName(
+  displayName: string | null,
+  username: string | null,
+): string {
+  return displayName || username || "Anonymous";
+}
+
+function mapAuthor(
+  profiles: ProfileJoin | ProfileJoin[] | null | undefined,
+): ItemAuthor | null {
+  if (!profiles) return null;
+  const profile = Array.isArray(profiles) ? profiles[0] : profiles;
+  if (!profile) return null;
+
+  return {
+    id: profile.id,
+    displayName: resolveDisplayName(profile.display_name, profile.username),
+    avatarUrl: profile.avatar_url,
+    isVerifiedOrganizer: profile.is_verified_organizer,
+    reputationPoints: profile.reputation_points,
+  };
+}
+
+export function mapItemRowToCardModel(item: ItemRowWithAuthor): ItemCardModel {
   const locationParts = [item.location, item.city, item.region].filter(Boolean);
 
   return {
@@ -37,10 +83,13 @@ export function mapItemRowToCardModel(item: ItemRow): ItemCardModel {
     imageUrl: item.image_url,
     sourceUrl: item.source_url,
     tags: item.tags,
+    author: mapAuthor(item.profiles),
   };
 }
 
-export function mapItemRowToDetailModel(item: ItemRow): ItemDetailModel {
+export function mapItemRowToDetailModel(
+  item: ItemRowWithAuthor,
+): ItemDetailModel {
   const cardModel = mapItemRowToCardModel(item);
 
   return {
