@@ -17,73 +17,33 @@ export interface ApprovedItemsFilters {
   tag?: string;
 }
 
-async function fetchDerivedFeaturedItemIds(): Promise<string[]> {
-  const { data, error } = await supabase
-    .from("items")
-    .select("id")
-    .eq("status", "approved")
-    .gte("event_date", new Date().toISOString())
-    .order("event_date", { ascending: true, nullsFirst: false })
-    .limit(3);
-
-  if (error) {
-    throw error;
-  }
-
-  const upcomingIds = (data ?? []).map((item) => item.id as string);
-
-  if (upcomingIds.length > 0) {
-    return upcomingIds;
-  }
-
-  const { data: fallbackData, error: fallbackError } = await supabase
-    .from("items")
-    .select("id")
-    .eq("status", "approved")
-    .order("created_at", { ascending: false })
-    .limit(2);
-
-  if (fallbackError) {
-    throw fallbackError;
-  }
-
-  return (fallbackData ?? []).map((item) => item.id as string);
-}
-
 export async function fetchApprovedItems(): Promise<ItemCardModel[]> {
   return fetchApprovedItemsWithFilters({});
 }
 
 export async function fetchFeaturedItems(): Promise<ItemCardModel[]> {
-  const featuredIds = await fetchDerivedFeaturedItemIds();
-
-  if (featuredIds.length === 0) {
-    return [];
-  }
-
-  const { data, error } = await supabase
+  // First: items explicitly marked as featured by an admin
+  const { data: explicit, error: explicitError } = await supabase
     .from("items")
     .select("*")
     .eq("status", "approved")
-    .in("id", featuredIds);
+    .eq("featured", true)
+    .order("event_date", { ascending: true, nullsFirst: false })
+    .limit(5);
 
-  if (error) {
-    throw error;
+  if (explicitError) {
+    throw explicitError;
   }
 
-  const items = (data ?? []) as ItemRow[];
-  const featuredOrder = new Map(featuredIds.map((id, index) => [id, index]));
-
-  return items
-    .sort(
-      (left, right) =>
-        (featuredOrder.get(left.id) ?? Number.MAX_SAFE_INTEGER) -
-        (featuredOrder.get(right.id) ?? Number.MAX_SAFE_INTEGER),
-    )
-    .map((item) => ({
+  if (explicit && explicit.length > 0) {
+    return (explicit as ItemRow[]).map((item) => ({
       ...mapItemRowToCardModel(item),
       featured: true,
     }));
+  }
+
+  // Fallback: no items marked featured yet — show nothing
+  return [];
 }
 
 export async function fetchUpcomingEvents(): Promise<ItemCardModel[]> {
@@ -179,7 +139,6 @@ export async function fetchApprovedRegions(): Promise<string[]> {
 export async function fetchApprovedItemById(
   itemId: string,
 ): Promise<ItemDetailModel> {
-  const featuredIds = await fetchDerivedFeaturedItemIds();
   const { data, error } = await supabase
     .from("items")
     .select("*")
@@ -191,8 +150,10 @@ export async function fetchApprovedItemById(
     throw error;
   }
 
+  const row = data as ItemRow;
+
   return {
-    ...mapItemRowToDetailModel(data as ItemRow),
-    featured: featuredIds.includes(itemId),
+    ...mapItemRowToDetailModel(row),
+    featured: Boolean(row.featured),
   };
 }

@@ -30,7 +30,7 @@ export function mapItemRowToCardModel(item: ItemRow): ItemCardModel {
     title: item.title,
     type: item.type,
     status: item.status,
-    featured: false,
+    featured: Boolean(item.featured),
     eventDate: item.event_date,
     createdAt: item.created_at,
     locationLabel: locationParts.length > 0 ? locationParts.join(", ") : null,

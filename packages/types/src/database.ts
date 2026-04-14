@@ -28,6 +28,7 @@ export interface ItemRow {
   region: string | null;
   tags: string[];
   status: ItemStatus;
+  featured: boolean;
   submitted_by: string | null;
   duplicate_of_item_id: string | null;
   created_at: string;
