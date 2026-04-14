@@ -46,6 +46,7 @@ apps/*/.expo-shared
 
 # Supabase (IMPORTANT)
 .supabase
+supabase/.temp
 
 # Vercel / deployment
 .vercel
