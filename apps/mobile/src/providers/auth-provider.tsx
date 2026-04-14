@@ -146,6 +146,6 @@ async function ensureProfile(user: User | null) {
     .from("profiles")
     .upsert(
       { id: user.id, username: user.email ?? null },
-      { onConflict: "id", ignoreDuplicates: false },
+      { onConflict: "id", ignoreDuplicates: true },
     );
 }

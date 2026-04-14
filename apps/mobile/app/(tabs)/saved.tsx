@@ -1,4 +1,6 @@
-import { FlatList, StyleSheet } from "react-native";
+import { useCallback } from "react";
+import { FlatList, RefreshControl, ScrollView, StyleSheet } from "react-native";
+import { useFocusEffect } from "expo-router";
 
 import { EmptyState } from "../../src/components/empty-state";
 import { ErrorState } from "../../src/components/error-state";
@@ -19,6 +21,22 @@ export default function SavedScreen() {
   const { user } = useAuth();
   const savedItems = useSavedItems(user?.id);
 
+  useFocusEffect(
+    useCallback(() => {
+      if (user) {
+        void savedItems.refetch();
+      }
+    }, [user]),
+  );
+
+  const refreshControl = (
+    <RefreshControl
+      refreshing={savedItems.isFetching && !savedItems.isLoading}
+      onRefresh={() => void savedItems.refetch()}
+      tintColor={mobileTheme.colors.textMuted}
+    />
+  );
+
   return (
     <ScreenShell>
       <AuthGate>
@@ -26,17 +44,29 @@ export default function SavedScreen() {
           <LoadingState label="Loading saved items..." />
         ) : null}
         {savedItems.isError ? (
-          <ErrorState
-            title="Could not load bookmarks"
-            description="Try again after checking your connection."
-            onRetry={() => savedItems.refetch()}
-          />
+          <ScrollView
+            contentContainerStyle={styles.content}
+            refreshControl={refreshControl}
+          >
+            {header}
+            <ErrorState
+              title="Could not load bookmarks"
+              description="Try again after checking your connection."
+              onRetry={() => savedItems.refetch()}
+            />
+          </ScrollView>
         ) : null}
         {savedItems.isSuccess && savedItems.data.length === 0 ? (
-          <EmptyState
-            title="No saved items yet"
-            description="Use the save button on an item detail screen to build your watchlist."
-          />
+          <ScrollView
+            contentContainerStyle={styles.content}
+            refreshControl={refreshControl}
+          >
+            {header}
+            <EmptyState
+              title="No saved items yet"
+              description="Use the save button on an item detail screen to build your watchlist."
+            />
+          </ScrollView>
         ) : null}
         {savedItems.isSuccess && savedItems.data.length > 0 ? (
           <FlatList
@@ -45,6 +75,7 @@ export default function SavedScreen() {
             contentContainerStyle={styles.content}
             ListHeaderComponent={header}
             renderItem={({ item }) => <ItemCard item={item} />}
+            refreshControl={refreshControl}
           />
         ) : null}
       </AuthGate>

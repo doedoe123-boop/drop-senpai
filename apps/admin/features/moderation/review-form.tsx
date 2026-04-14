@@ -13,10 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
 
-import {
-  fetchDuplicateCandidates,
-  moderateItem,
-} from "./api";
+import { fetchDuplicateCandidates, moderateItem } from "./api";
 import type { DuplicateCandidate } from "./types";
 
 interface ReviewDraft {
@@ -95,8 +92,9 @@ export function ReviewForm({
 
   const selectedDuplicate = useMemo(
     () =>
-      duplicateCandidates.find((candidate) => candidate.id === selectedDuplicateId) ??
-      null,
+      duplicateCandidates.find(
+        (candidate) => candidate.id === selectedDuplicateId,
+      ) ?? null,
     [duplicateCandidates, selectedDuplicateId],
   );
 
@@ -167,7 +165,11 @@ export function ReviewForm({
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Button asChild variant="ghost" className="text-slate-300 hover:text-white">
+        <Button
+          asChild
+          variant="ghost"
+          className="text-slate-300 hover:text-white"
+        >
           <Link href="/protected">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to queue
@@ -359,7 +361,8 @@ export function ReviewForm({
                 >
                   <div className="font-medium">{candidate.title}</div>
                   <div className="mt-1 text-xs text-slate-400">
-                    {candidate.type} · {candidate.city ?? candidate.location ?? "No location"}
+                    {candidate.type} ·{" "}
+                    {candidate.city ?? candidate.location ?? "No location"}
                   </div>
                 </button>
               ))}
@@ -380,6 +383,44 @@ export function ReviewForm({
         ) : null}
 
         <div className="mt-8 flex flex-wrap gap-3">
+          {item.status === "pending" ? (
+            <>
+              <Button
+                disabled={isSubmitting}
+                onClick={() => void runAction("approved")}
+                className="rounded-full border-emerald-400/20 bg-emerald-500/10 text-emerald-200 hover:bg-emerald-500/20"
+              >
+                {isSubmitting ? "Saving..." : "Approve"}
+              </Button>
+              <Button
+                variant="outline"
+                disabled={isSubmitting}
+                onClick={() => void runAction("rejected")}
+                className="rounded-full border-rose-400/20 bg-rose-500/10 text-rose-200 hover:bg-rose-500/20"
+              >
+                Reject
+              </Button>
+            </>
+          ) : null}
+          {item.status === "approved" ? (
+            <Button
+              variant="outline"
+              disabled={isSubmitting}
+              onClick={() => void runAction("rejected")}
+              className="rounded-full border-rose-400/20 bg-rose-500/10 text-rose-200 hover:bg-rose-500/20"
+            >
+              {isSubmitting ? "Saving..." : "Suspend"}
+            </Button>
+          ) : null}
+          {item.status === "rejected" ? (
+            <Button
+              disabled={isSubmitting}
+              onClick={() => void runAction("approved")}
+              className="rounded-full border-emerald-400/20 bg-emerald-500/10 text-emerald-200 hover:bg-emerald-500/20"
+            >
+              {isSubmitting ? "Saving..." : "Restore"}
+            </Button>
+          ) : null}
           <Button
             variant="outline"
             disabled={isSubmitting || !selectedDuplicateId}

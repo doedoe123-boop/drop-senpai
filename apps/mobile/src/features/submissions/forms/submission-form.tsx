@@ -81,6 +81,7 @@ export function SubmissionForm() {
   const createSubmission = useCreateSubmission(user?.id);
 
   const onSubmit = handleSubmit(async (values) => {
+    createSubmission.reset();
     const normalizedInput = cleanSubmissionPayload(values);
     let imageUrl = normalizedInput.image_url ?? null;
     let uploadedImagePath: string | null = null;
@@ -103,7 +104,10 @@ export function SubmissionForm() {
         try {
           await deleteUploadedSubmissionImage(uploadedImagePath);
         } catch (cleanupError) {
-          console.warn("Could not delete uploaded image after failed submission.", cleanupError);
+          console.warn(
+            "Could not delete uploaded image after failed submission.",
+            cleanupError,
+          );
         }
       }
 
