@@ -39,7 +39,10 @@ export function ItemDetailContent({ item }: ItemDetailContentProps) {
       : mobileTheme.colors.dropBadge;
 
   return (
-    <ScrollView contentContainerStyle={styles.content}>
+    <ScrollView
+      contentContainerStyle={styles.content}
+      showsVerticalScrollIndicator={false}
+    >
       {item.imageUrl ? (
         <Image
           source={{ uri: item.imageUrl }}

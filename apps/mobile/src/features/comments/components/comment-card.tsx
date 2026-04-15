@@ -18,7 +18,7 @@ export function CommentCard({
   onDelete,
   onToggleLike,
 }: CommentCardProps) {
-  const displayName = comment.author.username ?? "Anonymous";
+  const displayName = comment.author.displayName ?? "Anonymous";
 
   return (
     <View style={styles.card}>

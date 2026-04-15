@@ -12,6 +12,7 @@ export interface CommentWithAuthor {
   author: {
     id: string;
     username: string | null;
+    displayName: string | null;
     avatarUrl: string | null;
     reputationPoints: number;
   };

@@ -33,7 +33,11 @@ export function BookmarkButton({
 
   return (
     <Pressable
-      style={[styles.button, isIcon ? styles.iconButton : null]}
+      style={({ pressed }) => [
+        styles.button,
+        isIcon ? styles.iconButton : null,
+        pressed ? styles.buttonPressed : null,
+      ]}
       onPress={() => void handlePress()}
       disabled={toggleBookmark.isPending}
     >
@@ -81,6 +85,10 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
     borderRadius: mobileTheme.radius.full,
     backgroundColor: "rgba(13, 15, 23, 0.72)",
+  },
+  buttonPressed: {
+    opacity: 0.82,
+    transform: [{ scale: 0.98 }],
   },
   fullButtonContent: {
     flexDirection: "row",

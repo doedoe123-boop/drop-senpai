@@ -10,6 +10,7 @@ import { useFocusEffect } from "expo-router";
 
 import { EmptyState } from "../../src/components/empty-state";
 import { ErrorState } from "../../src/components/error-state";
+import { AnimatedEntrance } from "../../src/components/animated-entrance";
 import { LoadingState } from "../../src/components/loading-state";
 import { ScreenHeader } from "../../src/components/screen-header";
 import { ScreenShell } from "../../src/components/screen-shell";
@@ -85,31 +86,40 @@ export default function ExploreScreen() {
   return (
     <ScreenShell>
       {exploreItems.isLoading ? (
-        <LoadingState label="Searching approved items..." />
+        <LoadingState
+          variant="list"
+          label="Searching approved items..."
+        />
       ) : null}
       {exploreItems.isError ? (
         <ScrollView
           contentContainerStyle={styles.content}
           refreshControl={refreshControl}
+          showsVerticalScrollIndicator={false}
         >
-          {header}
-          <ErrorState
-            title="Could not load explore results"
-            description="Check your connection and try again."
-            onRetry={() => exploreItems.refetch()}
-          />
+          <AnimatedEntrance>
+            {header}
+            <ErrorState
+              title="Could not load explore results"
+              description="Check your connection and try again."
+              onRetry={() => exploreItems.refetch()}
+            />
+          </AnimatedEntrance>
         </ScrollView>
       ) : null}
       {exploreItems.isSuccess && exploreItems.data.length === 0 ? (
         <ScrollView
           contentContainerStyle={styles.content}
           refreshControl={refreshControl}
+          showsVerticalScrollIndicator={false}
         >
-          {header}
-          <EmptyState
-            title="No matching items"
-            description="Try clearing one or two filters to widen the results."
-          />
+          <AnimatedEntrance>
+            {header}
+            <EmptyState
+              title="No matching items"
+              description="Try clearing one or two filters to widen the results."
+            />
+          </AnimatedEntrance>
         </ScrollView>
       ) : null}
       {exploreItems.isSuccess && exploreItems.data.length > 0 ? (
@@ -118,8 +128,13 @@ export default function ExploreScreen() {
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.content}
           ListHeaderComponent={header}
-          renderItem={({ item }) => <ItemCard item={item} />}
+          renderItem={({ item, index }) => (
+            <AnimatedEntrance delay={index * 45} distance={14}>
+              <ItemCard item={item} />
+            </AnimatedEntrance>
+          )}
           refreshControl={refreshControl}
+          showsVerticalScrollIndicator={false}
         />
       ) : null}
     </ScreenShell>

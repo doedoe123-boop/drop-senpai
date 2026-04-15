@@ -5,6 +5,7 @@ import {
   StyleSheet,
 } from "react-native";
 
+import { AnimatedEntrance } from "../../src/components/animated-entrance";
 import { ScreenHeader } from "../../src/components/screen-header";
 import { ScreenShell } from "../../src/components/screen-shell";
 import { mobileTheme } from "../../src/constants/theme";
@@ -25,17 +26,21 @@ export default function SubmitScreen() {
             keyboardShouldPersistTaps="always"
             keyboardDismissMode="none"
             automaticallyAdjustKeyboardInsets={Platform.OS === "ios"}
-            contentInsetAdjustmentBehavior="automatic"
-            showsVerticalScrollIndicator={false}
-          >
+          contentInsetAdjustmentBehavior="automatic"
+          showsVerticalScrollIndicator={false}
+        >
+          <AnimatedEntrance>
             <ScreenHeader
               title="Submit an event or drop"
               description="Share a trusted source link and the core details. Submissions are saved as pending for admin review."
             />
+          </AnimatedEntrance>
+          <AnimatedEntrance delay={80}>
             <SubmissionForm />
-          </ScrollView>
-        </KeyboardAvoidingView>
-      </AuthGate>
+          </AnimatedEntrance>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </AuthGate>
     </ScreenShell>
   );
 }

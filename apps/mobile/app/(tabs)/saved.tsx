@@ -4,6 +4,7 @@ import { useFocusEffect } from "expo-router";
 
 import { EmptyState } from "../../src/components/empty-state";
 import { ErrorState } from "../../src/components/error-state";
+import { AnimatedEntrance } from "../../src/components/animated-entrance";
 import { LoadingState } from "../../src/components/loading-state";
 import { ScreenHeader } from "../../src/components/screen-header";
 import { ScreenShell } from "../../src/components/screen-shell";
@@ -41,31 +42,37 @@ export default function SavedScreen() {
     <ScreenShell>
       <AuthGate>
         {savedItems.isLoading ? (
-          <LoadingState label="Loading saved items..." />
+          <LoadingState variant="list" label="Loading saved items..." />
         ) : null}
         {savedItems.isError ? (
           <ScrollView
             contentContainerStyle={styles.content}
             refreshControl={refreshControl}
+            showsVerticalScrollIndicator={false}
           >
-            {header}
-            <ErrorState
-              title="Could not load bookmarks"
-              description="Try again after checking your connection."
-              onRetry={() => savedItems.refetch()}
-            />
+            <AnimatedEntrance>
+              {header}
+              <ErrorState
+                title="Could not load bookmarks"
+                description="Try again after checking your connection."
+                onRetry={() => savedItems.refetch()}
+              />
+            </AnimatedEntrance>
           </ScrollView>
         ) : null}
         {savedItems.isSuccess && savedItems.data.length === 0 ? (
           <ScrollView
             contentContainerStyle={styles.content}
             refreshControl={refreshControl}
+            showsVerticalScrollIndicator={false}
           >
-            {header}
-            <EmptyState
-              title="No saved items yet"
-              description="Use the save button on an item detail screen to build your watchlist."
-            />
+            <AnimatedEntrance>
+              {header}
+              <EmptyState
+                title="No saved items yet"
+                description="Use the save button on an item detail screen to build your watchlist."
+              />
+            </AnimatedEntrance>
           </ScrollView>
         ) : null}
         {savedItems.isSuccess && savedItems.data.length > 0 ? (
@@ -74,8 +81,13 @@ export default function SavedScreen() {
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.content}
             ListHeaderComponent={header}
-            renderItem={({ item }) => <ItemCard item={item} />}
+            renderItem={({ item, index }) => (
+              <AnimatedEntrance delay={index * 45} distance={14}>
+                <ItemCard item={item} />
+              </AnimatedEntrance>
+            )}
             refreshControl={refreshControl}
+            showsVerticalScrollIndicator={false}
           />
         ) : null}
       </AuthGate>

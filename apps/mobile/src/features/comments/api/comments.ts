@@ -9,11 +9,19 @@ interface CommentQueryRow {
   created_at: string;
   profiles: {
     id: string;
+    display_name: string | null;
     username: string | null;
     avatar_url: string | null;
     reputation_points: number;
   };
   comment_likes: Array<{ id: string; user_id: string }>;
+}
+
+function resolveCommentDisplayName(
+  displayName: string | null,
+  username: string | null,
+): string {
+  return displayName || username || "Anonymous";
 }
 
 function mapToCommentWithAuthor(
@@ -27,6 +35,10 @@ function mapToCommentWithAuthor(
     author: {
       id: row.profiles.id,
       username: row.profiles.username,
+      displayName: resolveCommentDisplayName(
+        row.profiles.display_name,
+        row.profiles.username,
+      ),
       avatarUrl: row.profiles.avatar_url,
       reputationPoints: row.profiles.reputation_points,
     },
@@ -45,7 +57,7 @@ export async function fetchComments(
   const { data, error } = await supabase
     .from("comments")
     .select(
-      "id, body, user_id, created_at, profiles!inner(id, username, avatar_url, reputation_points), comment_likes(id, user_id)",
+      "id, body, user_id, created_at, profiles!inner(id, display_name, username, avatar_url, reputation_points), comment_likes(id, user_id)",
     )
     .eq("item_id", itemId)
     .order("created_at", { ascending: false });

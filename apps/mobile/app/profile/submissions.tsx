@@ -1,5 +1,6 @@
 import { FlatList, RefreshControl, StyleSheet } from "react-native";
 
+import { AnimatedEntrance } from "../../src/components/animated-entrance";
 import { EmptyState } from "../../src/components/empty-state";
 import { ErrorState } from "../../src/components/error-state";
 import { LoadingState } from "../../src/components/loading-state";
@@ -18,20 +19,27 @@ export default function MySubmissionsScreen() {
     <ScreenShell>
       <AuthGate>
         {mySubmissions.isLoading ? (
-          <LoadingState label="Loading your submissions..." />
+          <LoadingState
+            variant="list"
+            label="Loading your submissions..."
+          />
         ) : null}
         {mySubmissions.isError ? (
-          <ErrorState
-            title="Could not load your submissions"
-            description="Try again after checking your connection."
-            onRetry={() => mySubmissions.refetch()}
-          />
+          <AnimatedEntrance>
+            <ErrorState
+              title="Could not load your submissions"
+              description="Try again after checking your connection."
+              onRetry={() => mySubmissions.refetch()}
+            />
+          </AnimatedEntrance>
         ) : null}
         {mySubmissions.isSuccess && mySubmissions.data.length === 0 ? (
-          <EmptyState
-            title="No submissions yet"
-            description="Once you submit an event or drop, it will appear here with its current status."
-          />
+          <AnimatedEntrance>
+            <EmptyState
+              title="No submissions yet"
+              description="Once you submit an event or drop, it will appear here with its current status."
+            />
+          </AnimatedEntrance>
         ) : null}
         {mySubmissions.isSuccess && mySubmissions.data.length > 0 ? (
           <FlatList
@@ -39,12 +47,18 @@ export default function MySubmissionsScreen() {
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.content}
             refreshControl={
-            <RefreshControl
+              <RefreshControl
                 refreshing={mySubmissions.isFetching && !mySubmissions.isLoading}
                 onRefresh={() => void mySubmissions.refetch()}
+                tintColor={mobileTheme.colors.textMuted}
               />
             }
-            renderItem={({ item }) => <SubmissionCard item={item} />}
+            renderItem={({ item, index }) => (
+              <AnimatedEntrance delay={index * 45} distance={14}>
+                <SubmissionCard item={item} />
+              </AnimatedEntrance>
+            )}
+            showsVerticalScrollIndicator={false}
           />
         ) : null}
       </AuthGate>

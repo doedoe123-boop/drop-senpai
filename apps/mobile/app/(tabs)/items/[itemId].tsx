@@ -1,6 +1,7 @@
 import { useLocalSearchParams } from "expo-router";
 import { View } from "react-native";
 
+import { AnimatedEntrance } from "../../../src/components/animated-entrance";
 import { EmptyState } from "../../../src/components/empty-state";
 import { ErrorState } from "../../../src/components/error-state";
 import { LoadingState } from "../../../src/components/loading-state";
@@ -15,16 +16,22 @@ export default function ItemDetailScreen() {
 
   return (
     <ScreenShell>
-      {approvedItem.isLoading ? <LoadingState label="Loading item details..." /> : null}
+      {approvedItem.isLoading ? (
+        <LoadingState variant="detail" label="Loading item details..." />
+      ) : null}
       {approvedItem.isError ? (
-        <ErrorState
-          title="Could not load this item"
-          description="The item may be missing, not approved, or the app could not reach Supabase."
-          onRetry={() => approvedItem.refetch()}
-        />
+        <AnimatedEntrance>
+          <ErrorState
+            title="Could not load this item"
+            description="The item may be missing, not approved, or the app could not reach Supabase."
+            onRetry={() => approvedItem.refetch()}
+          />
+        </AnimatedEntrance>
       ) : null}
       {approvedItem.isSuccess ? (
-        <ItemDetailContent item={approvedItem.data} />
+        <AnimatedEntrance distance={20}>
+          <ItemDetailContent item={approvedItem.data} />
+        </AnimatedEntrance>
       ) : null}
       {!itemId ? (
         <View>
